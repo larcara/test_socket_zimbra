@@ -3,7 +3,6 @@ require 'openssl'
 require 'thread'
 require 'open-uri'
 require 'digest'
-require 'httparty'
 require 'rubygems'
 require 'mechanize'
 
@@ -15,7 +14,6 @@ class Client
     @agent = Mechanize.new{ |agent|
 
       agent.verify_mode= OpenSSL::SSL::VERIFY_NONE}
-    puts "Start client for #{user} on #{uri}"
     @pre_auth = ENV["PRE_AUTH"]
     @user = user
     @agent.get(uri)
@@ -35,6 +33,7 @@ class Client
 
   def auth1
     time_stamp = Time.now.to_i * 1000
+
     @agent.get("/service/preauth?account=#{@user}&by=name&expires=0&timestamp=#{time_stamp}&preauth=#{compute_preauth(@user,time_stamp,@pre_auth)}")
 
     # You can also use something like:
@@ -53,11 +52,13 @@ end
 
 uri = ARGV[0]
 users = ARGV[1].split(",")
+counter = ARGV[2].to_i
+
 users_size = users.count
 arr = []
 
 
-400.times do |i|
+counter.times do |i|
   arr << Thread.new {
     #puts "start trhread #{i}"
     
