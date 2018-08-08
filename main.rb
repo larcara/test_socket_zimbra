@@ -15,7 +15,7 @@ class Client
     @agent = Mechanize.new{ |agent|
 
       agent.verify_mode= OpenSSL::SSL::VERIFY_NONE}
-
+    puts "Start client for #{user} on #{uri}"
     @pre_auth = ENV["PRE_AUTH"]
     @user = user
     @agent.get(uri)
@@ -51,7 +51,9 @@ end
 
 
 
-
+uri = ARGV[0]
+users = ARGV[1].split(",")
+users_size = users.count
 arr = []
 
 
@@ -61,7 +63,7 @@ arr = []
     
     begin
       sleep rand(1)
-      c1=Client.new("mass#{100+i}@888.zimbra.local", "https://172.17.0.3")
+      c1=Client.new(users[i % users_size], uri)
     rescue Exception => e
       puts "#proxy thread #{i} exception#{e}"
       
@@ -70,7 +72,7 @@ arr = []
   arr << Thread.new {
     begin
       sleep rand(1)
-      c2=Client.new("mass#{100+i}@888.zimbra.local", "https://172.17.0.3:8443")
+      c2=Client.new(users[i % users_size], uri)
     rescue Exception => e
       puts "#store thread #{i} exception#{e}"
     end
